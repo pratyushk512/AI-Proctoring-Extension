@@ -44,7 +44,7 @@ const updateTabSwitch = (data) => {
 
   console.log('Updated Candidates:', candidates);
 };
-socket.on('visibilitychange', (data) => {
+socket.on('tabVisibilityChanged', (data) => {
   console.log('Received fullscreen event:', data);
   updateTabSwitch(data);
 });
