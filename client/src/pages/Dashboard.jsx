@@ -19,7 +19,7 @@ export default function Dashboard() {
 
     const updateCandidate = (data, key) => {
       const { socketId, count } = data;
-    
+      console.log(key)
       setCandidates((prevCandidates) => {
         const updatedCandidates = prevCandidates.map((candidate) => {
           if (candidate.socketId === socketId) {
@@ -30,13 +30,13 @@ export default function Dashboard() {
           }
           return candidate;
         });
-    
+        
         if (!updatedCandidates.some(candidate => candidate.socketId === socketId)) {
           updatedCandidates.push({ socketId, [key]: count });
         }
     
         return updatedCandidates;
-      });
+      }); console.log(candidates);
     };
   
     socket.on("fullscreenChanged", (data) =>
@@ -48,15 +48,6 @@ export default function Dashboard() {
     socket.on("pasteEvent", (data) => updateCandidate(data, "paste"));
     socket.on("cutEvent", (data) => updateCandidate(data, "cut"));
 
-    // return () => {
-    //   // Clean up the socket connections when the component is unmounted
-    //   socket.off("fullscreenChanged");
-    //   socket.off("tabVisibilityChanged");
-    //   socket.off("windowFocusChanged");
-    //   socket.off("copyEvent");
-    //   socket.off("pasteEvent");
-    //   socket.off("cutEvent");
-    // };
   }, []);
 
   
@@ -111,14 +102,14 @@ export default function Dashboard() {
                       <div className="flex items-center">
                         <Star className="h-5 w-5 text-yellow-400" />
                         <span className="ml-1 text-xl font-semibold text-gray-900">
-                          {candidate.tabSwitch}
+                          {candidate.focus}
                         </span>
                       </div>
                     </div>
                     <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
                       <div
                         className="bg-blue-500 h-2 rounded-full"
-                        style={{ width: `${candidate.tabSwitch}%` }}
+                        style={{ width: `${candidate.focus}%` }}
                       ></div>
                     </div>
                   </div>
