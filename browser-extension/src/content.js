@@ -39,7 +39,7 @@ const socket = io('http://localhost:8000');
             const copiedContent = await navigator.clipboard.readText();
             console.log('Copied content:', copiedContent);
             copyCount++;
-            socket.emit('clipboardEvent', { action: 'copy', content: copiedContent , count : copyCount , ID : socket.id});
+            socket.emit('copyEvent', { action: 'copy', content: copiedContent , count : copyCount , ID : socket.id});
         } catch (err) {
             console.error('Failed to read clipboard content on copy:', err);
         }
@@ -51,7 +51,7 @@ const socket = io('http://localhost:8000');
             const pastedContent = await navigator.clipboard.readText();
             console.log('Pasted content:', pastedContent);
             pasteCount++;
-            socket.emit('clipboardEvent', { action: 'paste', content: pastedContent , count : pasteCount , ID : socket.id});
+            socket.emit('pasteEvent', { action: 'paste', content: pastedContent , count : pasteCount , ID : socket.id});
         } catch (err) {
             console.error('Failed to read clipboard content on paste:', err);
         }
@@ -63,7 +63,7 @@ const socket = io('http://localhost:8000');
             const cutContent = await navigator.clipboard.readText();
             console.log('Cut content:', cutContent);
             cutCount++;
-            socket.emit('clipboardEvent', { action: 'cut', content: cutContent , count : cutCount , ID : socket.id});
+            socket.emit('cutEvent', { action: 'cut', content: cutContent , count : cutCount , ID : socket.id});
         } catch (err) {
             console.error('Failed to read clipboard content on cut:', err);
         }

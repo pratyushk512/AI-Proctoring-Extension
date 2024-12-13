@@ -2,13 +2,146 @@ import { useState } from 'react'
 import { Search } from 'lucide-react'
 import CandidateCard from './CandidateCard'
 
-const candidates = [
-  {socketId:"12346",tabSwitch:"20",focus:"7",copy:"2",paste:"4",cut:"5",fullScreen:"6",score:"7"},
-  {socketId:"9997",tabSwitch:"7",focus:"2",copy:"3",paste:"4",cut:"5",fullScreen:"6",score:"7"},
-  {socketId:"12346",tabSwitch:"1",focus:"2",copy:"3",paste:"4",cut:"5",fullScreen:"6",score:"7"},
-  {socketId:"12346",tabSwitch:"1",focus:"2",copy:"3",paste:"4",cut:"5",fullScreen:"6",score:"7"},
-  {socketId:"12346",tabSwitch:"1",focus:"2",copy:"3",paste:"4",cut:"5",fullScreen:"6",score:"7"},
-]
+import io from 'socket.io-client';
+
+const socket = io('http://localhost:8000');
+
+const candidates = [];
+
+const updateFullScreen = (data) => {
+    const { socketId, count } = data;
+    const existingCandidate = candidates.find((candidate) => candidate.socketId === socketId);
+
+    if (existingCandidate) {
+        existingCandidate.fullScreen = count;
+    } else {
+        candidates.push({
+            socketId,
+            fullScreen: count,
+        });
+    }
+
+    console.log('Updated Candidates:', candidates);
+};
+socket.on('fullscreenChanged', (data) => {
+    console.log('Received fullscreen event:', data);
+    updateFullScreen(data);
+});
+
+//tabwitch
+const updateTabSwitch = (data) => {
+  const { socketId, count } = data;
+  const existingCandidate = candidates.find((candidate) => candidate.socketId === socketId);
+
+  if (existingCandidate) {
+      existingCandidate.tabSwitch = count;
+  } else {
+      candidates.push({
+          socketId,
+          tabSwitch: count,
+      });
+  }
+
+  console.log('Updated Candidates:', candidates);
+};
+socket.on('visibilitychange', (data) => {
+  console.log('Received fullscreen event:', data);
+  updateTabSwitch(data);
+});
+
+//focusblur
+const updateFocusChange = (data) => {
+  const { socketId, count } = data;
+  const existingCandidate = candidates.find((candidate) => candidate.socketId === socketId);
+
+  if (existingCandidate) {
+      existingCandidate.focus = count;
+  } else {
+      candidates.push({
+          socketId,
+          focus: count,
+      });
+  }
+
+  console.log('Updated Candidates:', candidates);
+};
+socket.on('windowFocusChanged', (data) => {
+  console.log('Received fullscreen event:', data);
+  updateFocusChange(data);
+});
+
+
+//copy
+const updateCopyEvents = (data) => {
+  const { socketId, count } = data;
+  const existingCandidate = candidates.find((candidate) => candidate.socketId === socketId);
+
+  if (existingCandidate) {
+      existingCandidate.copy = count;
+  } else {
+      candidates.push({
+          socketId,
+          copy: count,
+      });
+  }
+
+  console.log('Updated Candidates:', candidates);
+};
+socket.on('copyEvent', (data) => {
+  console.log('Received fullscreen event:', data);
+  updateCopyEvents(data);
+});
+
+//paste
+const updatePasteEvents = (data) => {
+  const { socketId, count } = data;
+  const existingCandidate = candidates.find((candidate) => candidate.socketId === socketId);
+
+  if (existingCandidate) {
+      existingCandidate.paste = count;
+  } else {
+      candidates.push({
+          socketId,
+          paste: count,
+      });
+  }
+
+  console.log('Updated Candidates:', candidates);
+};
+socket.on('pasteEvent', (data) => {
+  console.log('Received fullscreen event:', data);
+  updatePasteEvents(data);
+});
+
+//cut
+const updateCutEvents = (data) => {
+  const { socketId, count } = data;
+  const existingCandidate = candidates.find((candidate) => candidate.socketId === socketId);
+
+  if (existingCandidate) {
+      existingCandidate.cut = count;
+  } else {
+      candidates.push({
+          socketId,
+          cut: count,
+      });
+  }
+  console.log('Updated Candidates:', candidates);
+};
+socket.on('cutEvent', (data) => {
+  console.log('Received fullscreen event:', data);
+  updateCutEvents(data);
+});
+
+
+
+// const candidates = [
+//   {socketId:"12346",tabSwitch:"20",focus:"7",copy:"2",paste:"4",cut:"5",fullScreen:"6",score:"7"},
+//   {socketId:"9997",tabSwitch:"7",focus:"2",copy:"3",paste:"4",cut:"5",fullScreen:"6",score:"7"},
+//   {socketId:"12346",tabSwitch:"1",focus:"2",copy:"3",paste:"4",cut:"5",fullScreen:"6",score:"7"},
+//   {socketId:"12346",tabSwitch:"1",focus:"2",copy:"3",paste:"4",cut:"5",fullScreen:"6",score:"7"},
+//   {socketId:"12346",tabSwitch:"1",focus:"2",copy:"3",paste:"4",cut:"5",fullScreen:"6",score:"7"},
+// ]
 
 export default function Dashboard() {
   const [searchTerm, setSearchTerm] = useState('')
