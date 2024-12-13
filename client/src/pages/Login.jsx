@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { loginUser } from "@/services/auth";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -65,11 +66,10 @@ export default function Login() {
            onClick={handleSubmit}>
             Login
           </Button>
-          {message && <p className="mt-4 text-sm text-center">{message}</p>}
           <p className="mt-4 text-sm text-center">
             Don't have an account?{" "}
             <Link
-              href="/admin/register"
+              to="/"
               className="text-blue-600 hover:underline"
             >
               Register
