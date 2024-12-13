@@ -18,9 +18,8 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const handleSubmit = async () => {
-    const user={name,email,password}
-    JSON.stringify(user)
-    const response = await signup(user);
+    
+    const response = await signup(name,email,password);
     setName("");
     setEmail("");
     setPassword("");
@@ -83,7 +82,7 @@ export default function Register() {
             </Button>
             <p className="mt-4 text-sm text-center">
               Already have an account?{" "}
-              <Link href="/login" className="text-blue-600 hover:underline">
+              <Link to="/login" className="text-blue-600 hover:underline">
                 Login
               </Link>
             </p>
