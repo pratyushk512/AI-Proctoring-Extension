@@ -1,8 +1,8 @@
 import axios from "axios";
 
-export const callFlaskApi = async () => {
+export const callFlaskApi = async (inputData) => {
   try {
-    const inputData = [1.0, 12.0, 4.0, 2.0, 5.0, 2.0];
+    //const inputData = [1.0, 12.0, 4.0, 2.0, 5.0, 2.0];
 
     const response = await axios.post("http://127.0.0.1:5000/predict", {
       inputs: [inputData], 

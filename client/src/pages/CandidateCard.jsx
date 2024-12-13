@@ -1,4 +1,4 @@
-import { User, Mail, Star } from 'lucide-react'
+import { User, Star } from 'lucide-react'
 
 
 export default function CandidateCard({ candidate }) {
@@ -12,27 +12,107 @@ export default function CandidateCard({ candidate }) {
           <div className="ml-5 w-0 flex-1">
             <dl>
               <dt className="text-sm font-medium text-gray-500 truncate">
-                {candidate.name}
+                {candidate.socketId}
               </dt>
-              <dd className="flex items-center text-sm text-gray-900">
-                <Mail className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" />
-                {candidate.email}
-              </dd>
+              
             </dl>
           </div>
         </div>
+
+
         <div className="mt-5">
           <div className="flex items-center justify-between">
-            <div className="text-sm font-medium text-gray-500">Score</div>
+            <div className="text-sm font-medium text-gray-500">Tab Switches</div>
             <div className="flex items-center">
               <Star className="h-5 w-5 text-yellow-400" />
-              <span className="ml-1 text-xl font-semibold text-gray-900">{candidate.score}</span>
+              <span className="ml-1 text-xl font-semibold text-gray-900">{candidate.tabSwitch}</span>
             </div>
           </div>
           <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
             <div
               className="bg-blue-500 h-2 rounded-full"
-              style={{ width: `${candidate.score}%` }}
+              style={{ width: `${candidate.tabSwitch}%` }}
+            ></div>
+          </div>
+        </div>
+
+
+        <div className="mt-5">
+          <div className="flex items-center justify-between">
+            <div className="text-sm font-medium text-gray-500">Focus Changes</div>
+            <div className="flex items-center">
+              <Star className="h-5 w-5 text-yellow-400" />
+              <span className="ml-1 text-xl font-semibold text-gray-900">{candidate.focus}</span>
+            </div>
+          </div>
+          <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
+            <div
+              className="bg-blue-500 h-2 rounded-full"
+              style={{ width: `${candidate.focus}%` }}
+            ></div>
+          </div>
+        </div>
+
+        <div className="mt-5">
+          <div className="flex items-center justify-between">
+            <div className="text-sm font-medium text-gray-500">Copy Events</div>
+            <div className="flex items-center">
+              <Star className="h-5 w-5 text-yellow-400" />
+              <span className="ml-1 text-xl font-semibold text-gray-900">{candidate.copy}</span>
+            </div>
+          </div>
+          <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
+            <div
+              className="bg-blue-500 h-2 rounded-full"
+              style={{ width: `${candidate.copy}%` }}
+            ></div>
+          </div>
+        </div>
+
+        <div className="mt-5">
+          <div className="flex items-center justify-between">
+            <div className="text-sm font-medium text-gray-500">Paste Events</div>
+            <div className="flex items-center">
+              <Star className="h-5 w-5 text-yellow-400" />
+              <span className="ml-1 text-xl font-semibold text-gray-900">{candidate.paste}</span>
+            </div>
+          </div>
+          <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
+            <div
+              className="bg-blue-500 h-2 rounded-full"
+              style={{ width: `${candidate.paste}%` }}
+            ></div>
+          </div>
+        </div>
+
+        <div className="mt-5">
+          <div className="flex items-center justify-between">
+            <div className="text-sm font-medium text-gray-500">Cut Events</div>
+            <div className="flex items-center">
+              <Star className="h-5 w-5 text-yellow-400" />
+              <span className="ml-1 text-xl font-semibold text-gray-900">{candidate.cut}</span>
+            </div>
+          </div>
+          <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
+            <div
+              className="bg-blue-500 h-2 rounded-full"
+              style={{ width: `${candidate.cut}%` }}
+            ></div>
+          </div>
+        </div>
+
+        <div className="mt-5">
+          <div className="flex items-center justify-between">
+            <div className="text-sm font-medium text-gray-500">Full Screen Exits</div>
+            <div className="flex items-center">
+              <Star className="h-5 w-5 text-yellow-400" />
+              <span className="ml-1 text-xl font-semibold text-gray-900">{candidate.fullScreen}</span>
+            </div>
+          </div>
+          <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
+            <div
+              className="bg-blue-500 h-2 rounded-full"
+              style={{ width: `${candidate.fullScreen}%` }}
             ></div>
           </div>
         </div>
