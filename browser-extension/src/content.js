@@ -21,7 +21,7 @@ const calculateTypingSpeed = () => {
     const typingSpeed = Math.round(wordsTyped / typingTimeInMinutes);
 
     console.log(`Typing Speed: ${typingSpeed} words per minute`);
-    socket.emit('typeSpeed', { speed: typingSpeed, ID: socket.id });
+    socket.emit('typeSpeed', { speed: typingSpeed, socketId: socket.id });
     
     typingStartTime = Date.now();
     typingCharacterCount = 0;
@@ -41,7 +41,7 @@ document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') {
         console.log('Tab is now inactive.');
         tabVisibilityCount++;
-        socket.emit('tabVisibilityChanged', { state: 'inactive', count: tabVisibilityCount, ID: socket.id });
+        socket.emit('tabVisibilityChanged', { state: 'inactive', count: tabVisibilityCount, socketId: socket.id });
     } else if (document.visibilityState === 'visible') {
         console.log('Tab is now active.');
         socket.emit('tabVisibilityChanged', { state: 'active' });
@@ -56,7 +56,7 @@ window.addEventListener('focus', () => {
     window.addEventListener('blur', () => {
         console.log('Window lost focus.');
         windowFocusCount++;
-        socket.emit('windowFocusChanged', { state: 'blur' , count : windowFocusCount , ID : socket.id });
+        socket.emit('windowFocusChanged', { state: 'blur' , count : windowFocusCount , socketId : socket.id });
     });
 
     
@@ -65,7 +65,7 @@ window.addEventListener('focus', () => {
             const copiedContent = await navigator.clipboard.readText();
             console.log('Copied content:', copiedContent);
             copyCount++;
-            socket.emit('clipboardEvent', { action: 'copy', content: copiedContent , count : copyCount , ID : socket.id});
+            socket.emit('copyEvent', { action: 'copy', content: copiedContent , count : copyCount , socketId : socket.id});
         } catch (err) {
             console.error('Failed to read clipboard content on copy:', err);
         }
@@ -77,7 +77,7 @@ window.addEventListener('focus', () => {
             const pastedContent = await navigator.clipboard.readText();
             console.log('Pasted content:', pastedContent);
             pasteCount++;
-            socket.emit('clipboardEvent', { action: 'paste', content: pastedContent , count : pasteCount , ID : socket.id});
+            socket.emit('pasteEvent', { action: 'paste', content: pastedContent , count : pasteCount , socketId : socket.id});
         } catch (err) {
             console.error('Failed to read clipboard content on paste:', err);
         }
@@ -89,7 +89,7 @@ window.addEventListener('focus', () => {
             const cutContent = await navigator.clipboard.readText();
             console.log('Cut content:', cutContent);
             cutCount++;
-            socket.emit('clipboardEvent', { action: 'cut', content: cutContent , count : cutCount , ID : socket.id});
+            socket.emit('cutEvent', { action: 'cut', content: cutContent , count : cutCount , socketId : socket.id});
         } catch (err) {
             console.error('Failed to read clipboard content on cut:', err);
         }
@@ -127,7 +127,7 @@ document.addEventListener("fullscreenchange", () => {
     } else {
         console.log("Exited fullscreen mode");
         fullscreenCount++;
-        socket.emit('fullscreenChanged', { state: 'exited', count: fullscreenCount, ID: socket.id });
+        socket.emit('fullscreenChanged', { state: 'exited', count: fullscreenCount, socketId: socket.id });
     }
 });
 
@@ -146,13 +146,13 @@ document.addEventListener("keydown", (event) => {
         } else {
             goFullScreen();
             fullscreenCount++;
-            socket.emit('fullscreenChanged', { state: 'exited', count: fullscreenCount, ID: socket.id });
+            socket.emit('fullscreenChanged', { state: 'exited', count: fullscreenCount, socketId: socket.id });
         }
     }
 
     if (event.key === "Escape" && document.fullscreenElement) {
         exitFullScreen();
         fullscreenCount++;
-        socket.emit('fullscreenChanged', { state: 'exited', count: fullscreenCount, ID: socket.id });
+        socket.emit('fullscreenChanged', { state: 'exited', count: fullscreenCount, socketId: socket.id });
     }
 });

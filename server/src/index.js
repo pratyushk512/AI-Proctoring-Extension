@@ -40,11 +40,16 @@ connectDB()
 
 app.use(express.static('public'));
 
+let recipientId;
 
 io.on('connection', (socket) => {
   console.log('A user connected:', socket.id);
 
-  
+  socket.on('frontend', (data) => {
+    recipientId = data.socketId;
+    console.log(`Client registered with ID: ${data.socketId}`);
+});
+
   socket.on('tabVisibilityChanged', (data) => {
     io.to(recipientId).emit('tabVisibilityChanged', data);
     console.log('Tab visibility changed:', data);
@@ -80,7 +85,7 @@ io.on('connection', (socket) => {
 
   socket.on('typeSpeed', (data) => {
     io.to(recipientId).emit('typeSpeed', data);
-    console.log('Fullscreen state changed:', data);
+    console.log('TypeSpeed changed:', data);
   });
 
   socket.on('disconnect', () => {
