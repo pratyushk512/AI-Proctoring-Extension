@@ -1,12 +1,20 @@
 import io from 'socket.io-client';
 
+let tabVisibilityCount = 0;
+let windowFocusCount = 0;
+let copyCount = 0;
+let pasteCount = 0;
+let cutCount = 0;
+let fullscreenCount = 0;
+
 const socket = io('http://localhost:8000');
     console.log(socket)
     
     document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'hidden') {
             console.log('Tab is now inactive.');
-            socket.emit('tabVisibilityChanged', { state: 'inactive' });
+            tabVisibilityCount++;
+            socket.emit('tabVisibilityChanged', { state: 'inactive' , count : tabVisibilityCount , ID : socket.id });
         } else if (document.visibilityState === 'visible') {
             console.log('Tab is now active.');
             socket.emit('tabVisibilityChanged', { state: 'active' });
@@ -21,7 +29,8 @@ const socket = io('http://localhost:8000');
 
     window.addEventListener('blur', () => {
         console.log('Window lost focus.');
-        socket.emit('windowFocusChanged', { state: 'blur' });
+        windowFocusCount++;
+        socket.emit('windowFocusChanged', { state: 'blur' , count : windowFocusCount , ID : socket.id });
     });
 
     
@@ -29,7 +38,8 @@ const socket = io('http://localhost:8000');
         try {
             const copiedContent = await navigator.clipboard.readText();
             console.log('Copied content:', copiedContent);
-            socket.emit('clipboardEvent', { action: 'copy', content: copiedContent });
+            copyCount++;
+            socket.emit('clipboardEvent', { action: 'copy', content: copiedContent , count : copyCount , ID : socket.id});
         } catch (err) {
             console.error('Failed to read clipboard content on copy:', err);
         }
@@ -40,7 +50,8 @@ const socket = io('http://localhost:8000');
         try {
             const pastedContent = await navigator.clipboard.readText();
             console.log('Pasted content:', pastedContent);
-            socket.emit('clipboardEvent', { action: 'paste', content: pastedContent });
+            pasteCount++;
+            socket.emit('clipboardEvent', { action: 'paste', content: pastedContent , count : pasteCount , ID : socket.id});
         } catch (err) {
             console.error('Failed to read clipboard content on paste:', err);
         }
@@ -51,7 +62,8 @@ const socket = io('http://localhost:8000');
         try {
             const cutContent = await navigator.clipboard.readText();
             console.log('Cut content:', cutContent);
-            socket.emit('clipboardEvent', { action: 'cut', content: cutContent });
+            cutCount++;
+            socket.emit('clipboardEvent', { action: 'cut', content: cutContent , count : cutCount , ID : socket.id});
         } catch (err) {
             console.error('Failed to read clipboard content on cut:', err);
         }
@@ -89,7 +101,8 @@ const socket = io('http://localhost:8000');
             socket.emit('fullscreenChanged', { state: 'entered' });
         } else {
             console.log("Exited fullscreen mode");
-            socket.emit('fullscreenChanged', { state: 'exited' });
+            fullscreenCount++;
+            socket.emit('fullscreenChanged', { state: 'exited' , count : fullscreenCount , ID : socket.id});
         }
     });
 
@@ -101,12 +114,14 @@ const socket = io('http://localhost:8000');
                 socket.emit('fullscreenChanged', { state: 'exited' });
             } else {
                 goFullScreen();
-                socket.emit('fullscreenChanged', { state: 'entered' });
+                fullscreenCount++;
+                socket.emit('fullscreenChanged', { state: 'exited' , count : fullscreenCount , ID : socket.id});
             }
         }
 
         if (event.key === "Escape" && document.fullscreenElement) {
             exitFullScreen();
-            socket.emit('fullscreenChanged', { state: 'exited' });
+            fullscreenCount++;
+            socket.emit('fullscreenChanged', { state: 'exited' , count : fullscreenCount , ID : socket.id});
         }
     });
