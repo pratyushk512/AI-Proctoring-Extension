@@ -46,26 +46,43 @@ io.on('connection', (socket) => {
 
   
   socket.on('tabVisibilityChanged', (data) => {
+    io.to(recipientId).emit('tabVisibilityChanged', data);
     console.log('Tab visibility changed:', data);
     
   });
 
   
   socket.on('windowFocusChanged', (data) => {
+    io.to(recipientId).emit('windowFocusChanged', data);
     console.log('Window focus state changed:', data);
   });
 
   
-  socket.on('clipboardEvent', (data) => {
-    console.log(`${data.action} event received. Content:`, data.content);
+  socket.on('copyEvent', (data) => {
+    io.to(recipientId).emit('copyEvent', data);
+    console.log(`Copy event received. Content:`, data.content);
   });
 
-  
+  socket.on('pasteEvent', (data) => {
+    io.to(recipientId).emit('pasteEvent', data);
+    console.log(`Paste event received. Content:`, data.content);
+  });
+
+  socket.on('cutEvent', (data) => {
+    io.to(recipientId).emit('cutEvent', data);
+    console.log(`Cut event received. Content:`, data.content);
+  });
+
   socket.on('fullscreenChanged', (data) => {
+    io.to(recipientId).emit('fullscreenChanged', data);
     console.log('Fullscreen state changed:', data);
   });
 
-  
+  socket.on('typeSpeed', (data) => {
+    io.to(recipientId).emit('typeSpeed', data);
+    console.log('Fullscreen state changed:', data);
+  });
+
   socket.on('disconnect', () => {
     console.log('A user disconnected:', socket.id);
   });
