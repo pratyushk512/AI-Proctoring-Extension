@@ -8,24 +8,50 @@ let cutCount = 0;
 let fullscreenCount = 0;
 
 const socket = io('http://localhost:8000');
-    console.log(socket)
+console.log(socket);
+
+
+let typingStartTime = 0;
+let typingCharacterCount = 0;
+let typingInterval;
+
+const calculateTypingSpeed = () => {
+    const typingTimeInMinutes = (Date.now() - typingStartTime) / 60000; 
+    const wordsTyped = typingCharacterCount / 5; 
+    const typingSpeed = Math.round(wordsTyped / typingTimeInMinutes);
+
+    console.log(`Typing Speed: ${typingSpeed} words per minute`);
+    socket.emit('typeSpeed', { speed: typingSpeed, ID: socket.id });
     
-    document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'hidden') {
-            console.log('Tab is now inactive.');
-            tabVisibilityCount++;
-            socket.emit('tabVisibilityChanged', { state: 'inactive' , count : tabVisibilityCount , ID : socket.id });
-        } else if (document.visibilityState === 'visible') {
-            console.log('Tab is now active.');
-            socket.emit('tabVisibilityChanged', { state: 'active' });
-        }
-    });
+    typingStartTime = Date.now();
+    typingCharacterCount = 0;
+};
 
 
-    window.addEventListener('focus', () => {
-        console.log('Window is in focus.');
-        socket.emit('windowFocusChanged', { state: 'focus' });
-    });
+const startTypingSpeedTracker = () => {
+    typingStartTime = Date.now();
+    typingCharacterCount = 0;
+
+    typingInterval = setInterval(() => {
+        calculateTypingSpeed();
+    }, 20000); 
+};
+
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+        console.log('Tab is now inactive.');
+        tabVisibilityCount++;
+        socket.emit('tabVisibilityChanged', { state: 'inactive', count: tabVisibilityCount, ID: socket.id });
+    } else if (document.visibilityState === 'visible') {
+        console.log('Tab is now active.');
+        socket.emit('tabVisibilityChanged', { state: 'active' });
+    }
+});
+
+window.addEventListener('focus', () => {
+    console.log('Window is in focus.');
+    socket.emit('windowFocusChanged', { state: 'focus' });
+});
 
     window.addEventListener('blur', () => {
         console.log('Window lost focus.');
@@ -39,7 +65,7 @@ const socket = io('http://localhost:8000');
             const copiedContent = await navigator.clipboard.readText();
             console.log('Copied content:', copiedContent);
             copyCount++;
-            socket.emit('copyEvent', { action: 'copy', content: copiedContent , count : copyCount , ID : socket.id});
+            socket.emit('clipboardEvent', { action: 'copy', content: copiedContent , count : copyCount , ID : socket.id});
         } catch (err) {
             console.error('Failed to read clipboard content on copy:', err);
         }
@@ -51,7 +77,7 @@ const socket = io('http://localhost:8000');
             const pastedContent = await navigator.clipboard.readText();
             console.log('Pasted content:', pastedContent);
             pasteCount++;
-            socket.emit('pasteEvent', { action: 'paste', content: pastedContent , count : pasteCount , ID : socket.id});
+            socket.emit('clipboardEvent', { action: 'paste', content: pastedContent , count : pasteCount , ID : socket.id});
         } catch (err) {
             console.error('Failed to read clipboard content on paste:', err);
         }
@@ -63,7 +89,7 @@ const socket = io('http://localhost:8000');
             const cutContent = await navigator.clipboard.readText();
             console.log('Cut content:', cutContent);
             cutCount++;
-            socket.emit('cutEvent', { action: 'cut', content: cutContent , count : cutCount , ID : socket.id});
+            socket.emit('clipboardEvent', { action: 'cut', content: cutContent , count : cutCount , ID : socket.id});
         } catch (err) {
             console.error('Failed to read clipboard content on cut:', err);
         }
@@ -82,46 +108,51 @@ const socket = io('http://localhost:8000');
         }
     }
 
-    function exitFullScreen() {
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
-        } else if (document.mozCancelFullScreen) {
-            document.mozCancelFullScreen();
-        } else if (document.webkitExitFullscreen) {
-            document.webkitExitFullscreen();
-        } else if (document.msExitFullscreen) {
-            document.msExitFullscreen();
+function exitFullScreen() {
+    if (document.exitFullscreen) {
+        document.exitFullscreen();
+    } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+    } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+    }
+}
+
+document.addEventListener("fullscreenchange", () => {
+    if (document.fullscreenElement) {
+        console.log("Entered fullscreen mode");
+        socket.emit('fullscreenChanged', { state: 'entered' });
+    } else {
+        console.log("Exited fullscreen mode");
+        fullscreenCount++;
+        socket.emit('fullscreenChanged', { state: 'exited', count: fullscreenCount, ID: socket.id });
+    }
+});
+
+document.addEventListener("keydown", (event) => {
+    
+    typingCharacterCount++; 
+
+    if (typingStartTime === 0) {
+        startTypingSpeedTracker(); 
+    }
+
+    if (event.key === "F") {
+        if (document.fullscreenElement) {
+            exitFullScreen();
+            socket.emit('fullscreenChanged', { state: 'exited' });
+        } else {
+            goFullScreen();
+            fullscreenCount++;
+            socket.emit('fullscreenChanged', { state: 'exited', count: fullscreenCount, ID: socket.id });
         }
     }
 
-    
-    document.addEventListener("fullscreenchange", () => {
-        if (document.fullscreenElement) {
-            console.log("Entered fullscreen mode");
-            socket.emit('fullscreenChanged', { state: 'entered' });
-        } else {
-            console.log("Exited fullscreen mode");
-            fullscreenCount++;
-            socket.emit('fullscreenChanged', { state: 'exited' , count : fullscreenCount , ID : socket.id});
-        }
-    });
-
-    
-    document.addEventListener("keydown", (event) => {
-        if (event.key === "f" || event.key === "F") {
-            if (document.fullscreenElement) {
-                exitFullScreen();
-                socket.emit('fullscreenChanged', { state: 'exited' });
-            } else {
-                goFullScreen();
-                fullscreenCount++;
-                socket.emit('fullscreenChanged', { state: 'exited' , count : fullscreenCount , ID : socket.id});
-            }
-        }
-
-        if (event.key === "Escape" && document.fullscreenElement) {
-            exitFullScreen();
-            fullscreenCount++;
-            socket.emit('fullscreenChanged', { state: 'exited' , count : fullscreenCount , ID : socket.id});
-        }
-    });
+    if (event.key === "Escape" && document.fullscreenElement) {
+        exitFullScreen();
+        fullscreenCount++;
+        socket.emit('fullscreenChanged', { state: 'exited', count: fullscreenCount, ID: socket.id });
+    }
+});
