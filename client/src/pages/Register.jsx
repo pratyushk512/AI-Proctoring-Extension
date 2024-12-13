@@ -40,7 +40,7 @@ export default function Register() {
                 <Input
                   id="name"
                   name="name"
-                  type="mane"
+                  type="name"
                   placeholder="Enter your name"
                   onChange={(e) => {
                     setName(e.target.value);

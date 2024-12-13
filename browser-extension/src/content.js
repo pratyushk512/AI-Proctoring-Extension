@@ -53,56 +53,60 @@ window.addEventListener('focus', () => {
     socket.emit('windowFocusChanged', { state: 'focus' });
 });
 
-window.addEventListener('blur', () => {
-    console.log('Window lost focus.');
-    windowFocusCount++;
-    socket.emit('windowFocusChanged', { state: 'blur', count: windowFocusCount, ID: socket.id });
-});
+    window.addEventListener('blur', () => {
+        console.log('Window lost focus.');
+        windowFocusCount++;
+        socket.emit('windowFocusChanged', { state: 'blur' , count : windowFocusCount , ID : socket.id });
+    });
 
-document.addEventListener('copy', async (e) => {
-    try {
-        const copiedContent = await navigator.clipboard.readText();
-        console.log('Copied content:', copiedContent);
-        copyCount++;
-        socket.emit('copyEvent', { action: 'copy', content: copiedContent, count: copyCount, ID: socket.id });
-    } catch (err) {
-        console.error('Failed to read clipboard content on copy:', err);
-    }
-});
+    
+    document.addEventListener('copy', async (e) => {
+        try {
+            const copiedContent = await navigator.clipboard.readText();
+            console.log('Copied content:', copiedContent);
+            copyCount++;
+            socket.emit('clipboardEvent', { action: 'copy', content: copiedContent , count : copyCount , ID : socket.id});
+        } catch (err) {
+            console.error('Failed to read clipboard content on copy:', err);
+        }
+    });
 
-document.addEventListener('paste', async (e) => {
-    try {
-        const pastedContent = await navigator.clipboard.readText();
-        console.log('Pasted content:', pastedContent);
-        pasteCount++;
-        socket.emit('pasteEvent', { action: 'paste', content: pastedContent, count: pasteCount, ID: socket.id });
-    } catch (err) {
-        console.error('Failed to read clipboard content on paste:', err);
-    }
-});
+    
+    document.addEventListener('paste', async (e) => {
+        try {
+            const pastedContent = await navigator.clipboard.readText();
+            console.log('Pasted content:', pastedContent);
+            pasteCount++;
+            socket.emit('clipboardEvent', { action: 'paste', content: pastedContent , count : pasteCount , ID : socket.id});
+        } catch (err) {
+            console.error('Failed to read clipboard content on paste:', err);
+        }
+    });
 
-document.addEventListener('cut', async (e) => {
-    try {
-        const cutContent = await navigator.clipboard.readText();
-        console.log('Cut content:', cutContent);
-        cutCount++;
-        socket.emit('cutEvent', { action: 'cut', content: cutContent, count: cutCount, ID: socket.id });
-    } catch (err) {
-        console.error('Failed to read clipboard content on cut:', err);
-    }
-});
+    
+    document.addEventListener('cut', async (e) => {
+        try {
+            const cutContent = await navigator.clipboard.readText();
+            console.log('Cut content:', cutContent);
+            cutCount++;
+            socket.emit('clipboardEvent', { action: 'cut', content: cutContent , count : cutCount , ID : socket.id});
+        } catch (err) {
+            console.error('Failed to read clipboard content on cut:', err);
+        }
+    });
 
-function goFullScreen() {
-    if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen();
-    } else if (document.documentElement.mozRequestFullScreen) {
-        document.documentElement.mozRequestFullScreen();
-    } else if (document.documentElement.webkitRequestFullscreen) {
-        document.documentElement.webkitRequestFullscreen();
-    } else if (document.documentElement.msRequestFullscreen) {
-        document.documentElement.msRequestFullscreen();
+    
+    function goFullScreen() {
+        if (document.documentElement.requestFullscreen) {
+            document.documentElement.requestFullscreen();
+        } else if (document.documentElement.mozRequestFullScreen) {
+            document.documentElement.mozRequestFullScreen();
+        } else if (document.documentElement.webkitRequestFullscreen) {
+            document.documentElement.webkitRequestFullscreen();
+        } else if (document.documentElement.msRequestFullscreen) {
+            document.documentElement.msRequestFullscreen();
+        }
     }
-}
 
 function exitFullScreen() {
     if (document.exitFullscreen) {
