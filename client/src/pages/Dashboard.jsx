@@ -1,160 +1,64 @@
-import { useState } from 'react'
-import { Search } from 'lucide-react'
-import CandidateCard from './CandidateCard'
-
-import io from 'socket.io-client';
-
-const socket = io('http://localhost:8000');
-
-const candidates = [];
-
-const updateFullScreen = (data) => {
-    const { socketId, count } = data;
-    const existingCandidate = candidates.find((candidate) => candidate.socketId === socketId);
-
-    if (existingCandidate) {
-        existingCandidate.fullScreen = count;
-    } else {
-        candidates.push({
-            socketId,
-            fullScreen: count,
-        });
-    }
-
-    console.log('Updated Candidates:', candidates);
-};
-socket.on('fullscreenChanged', (data) => {
-    console.log('Received fullscreen event:', data);
-    updateFullScreen(data);
-});
-
-//tabwitch
-const updateTabSwitch = (data) => {
-  const { socketId, count } = data;
-  const existingCandidate = candidates.find((candidate) => candidate.socketId === socketId);
-
-  if (existingCandidate) {
-      existingCandidate.tabSwitch = count;
-  } else {
-      candidates.push({
-          socketId,
-          tabSwitch: count,
-      });
-  }
-
-  console.log('Updated Candidates:', candidates);
-};
-socket.on('tabVisibilityChanged', (data) => {
-  console.log('Received fullscreen event:', data);
-  updateTabSwitch(data);
-});
-
-//focusblur
-const updateFocusChange = (data) => {
-  const { socketId, count } = data;
-  const existingCandidate = candidates.find((candidate) => candidate.socketId === socketId);
-
-  if (existingCandidate) {
-      existingCandidate.focus = count;
-  } else {
-      candidates.push({
-          socketId,
-          focus: count,
-      });
-  }
-
-  console.log('Updated Candidates:', candidates);
-};
-socket.on('windowFocusChanged', (data) => {
-  console.log('Received fullscreen event:', data);
-  updateFocusChange(data);
-});
+import { useState, useEffect } from "react";
+import { Search } from "lucide-react";
+import CandidateCard from "./CandidateCard";
+import io from "socket.io-client";
+import { User, Star } from 'lucide-react'
 
 
-//copy
-const updateCopyEvents = (data) => {
-  const { socketId, count } = data;
-  const existingCandidate = candidates.find((candidate) => candidate.socketId === socketId);
-
-  if (existingCandidate) {
-      existingCandidate.copy = count;
-  } else {
-      candidates.push({
-          socketId,
-          copy: count,
-      });
-  }
-
-  console.log('Updated Candidates:', candidates);
-};
-socket.on('copyEvent', (data) => {
-  console.log('Received fullscreen event:', data);
-  updateCopyEvents(data);
-});
-
-//paste
-const updatePasteEvents = (data) => {
-  const { socketId, count } = data;
-  const existingCandidate = candidates.find((candidate) => candidate.socketId === socketId);
-
-  if (existingCandidate) {
-      existingCandidate.paste = count;
-  } else {
-      candidates.push({
-          socketId,
-          paste: count,
-      });
-  }
-
-  console.log('Updated Candidates:', candidates);
-};
-socket.on('pasteEvent', (data) => {
-  console.log('Received fullscreen event:', data);
-  updatePasteEvents(data);
-});
-
-//cut
-const updateCutEvents = (data) => {
-  const { socketId, count } = data;
-  const existingCandidate = candidates.find((candidate) => candidate.socketId === socketId);
-
-  if (existingCandidate) {
-      existingCandidate.cut = count;
-  } else {
-      candidates.push({
-          socketId,
-          cut: count,
-      });
-  }
-  console.log('Updated Candidates:', candidates);
-};
-socket.on('cutEvent', (data) => {
-  console.log('Received fullscreen event:', data);
-  updateCutEvents(data);
-});
-
-
-
-// const candidates = [
-//   {socketId:"12346",tabSwitch:"20",focus:"7",copy:"2",paste:"4",cut:"5",fullScreen:"6",score:"7"},
-//   {socketId:"9997",tabSwitch:"7",focus:"2",copy:"3",paste:"4",cut:"5",fullScreen:"6",score:"7"},
-//   {socketId:"12346",tabSwitch:"1",focus:"2",copy:"3",paste:"4",cut:"5",fullScreen:"6",score:"7"},
-//   {socketId:"12346",tabSwitch:"1",focus:"2",copy:"3",paste:"4",cut:"5",fullScreen:"6",score:"7"},
-//   {socketId:"12346",tabSwitch:"1",focus:"2",copy:"3",paste:"4",cut:"5",fullScreen:"6",score:"7"},
-// ]
+const socket = io("http://localhost:8000");
 
 export default function Dashboard() {
-  const [searchTerm, setSearchTerm] = useState('')
+  const [searchTerm, setSearchTerm] = useState("");
+  const [candidates, setCandidates] = useState([]);
 
-  const filteredCandidates = candidates.filter(candidate =>
-    candidate.socketId.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  useEffect(() => {
+    socket.on("connect", () => {
+      console.log("Connected with socket ID:", socket.id);
+      socket.emit("frontend", { socketId: socket.id });
+    });
+
+    const updateCandidate = (data, key) => {
+      const { socketId, count } = data;
+      console.log(key)
+      setCandidates((prevCandidates) => {
+        const updatedCandidates = prevCandidates.map((candidate) => {
+          if (candidate.socketId === socketId) {
+            return {
+              ...candidate,
+              [key]: count,  
+            };
+          }
+          return candidate;
+        });
+        
+        if (!updatedCandidates.some(candidate => candidate.socketId === socketId)) {
+          updatedCandidates.push({ socketId, [key]: count });
+        }
+    
+        return updatedCandidates;
+      }); console.log(candidates);
+    };
   
+    socket.on("fullscreenChanged", (data) =>
+      updateCandidate(data, "fullScreen")
+    );
+    socket.on("visibilitychange", (data) => updateCandidate(data, "tabSwitch"));
+    socket.on("windowFocusChanged", (data) => updateCandidate(data, "focus"));
+    socket.on("copyEvent", (data) => updateCandidate(data, "copy"));
+    socket.on("pasteEvent", (data) => updateCandidate(data, "paste"));
+    socket.on("cutEvent", (data) => updateCandidate(data, "cut"));
+
+  }, []);
+
+  
+
   return (
     <div className="min-h-screen bg-gray-100">
       <header className="bg-white shadow">
         <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-gray-900">Candidate Dashboard</h1>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Candidate Dashboard
+          </h1>
         </div>
       </header>
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -174,13 +78,147 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredCandidates.map(candidate => (
-              <CandidateCard key={candidate.socketId} candidate={candidate} />
+            {candidates.map((candidate) => (
+              <div className="bg-white overflow-hidden shadow rounded-lg">
+                <div className="px-4 py-5 sm:p-6">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0 bg-blue-500 rounded-md p-3">
+                      <User className="h-6 w-6 text-white" />
+                    </div>
+                    <div className="ml-5 w-0 flex-1">
+                      <dl>
+                        <dt className="text-sm font-medium text-gray-500 truncate">
+                          {candidate.socketId}
+                        </dt>
+                      </dl>
+                    </div>
+                  </div>
+
+                  <div className="mt-5">
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm font-medium text-gray-500">
+                        Tab Switches
+                      </div>
+                      <div className="flex items-center">
+                        <Star className="h-5 w-5 text-yellow-400" />
+                        <span className="ml-1 text-xl font-semibold text-gray-900">
+                          {candidate.focus}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-blue-500 h-2 rounded-full"
+                        style={{ width: `${candidate.focus}%` }}
+                      ></div>
+                    </div>
+                  </div>
+
+                  <div className="mt-5">
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm font-medium text-gray-500">
+                        Focus Changes
+                      </div>
+                      <div className="flex items-center">
+                        <Star className="h-5 w-5 text-yellow-400" />
+                        <span className="ml-1 text-xl font-semibold text-gray-900">
+                          {candidate.focus}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-blue-500 h-2 rounded-full"
+                        style={{ width: `${candidate.focus}%` }}
+                      ></div>
+                    </div>
+                  </div>
+
+                  <div className="mt-5">
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm font-medium text-gray-500">
+                        Copy Events
+                      </div>
+                      <div className="flex items-center">
+                        <Star className="h-5 w-5 text-yellow-400" />
+                        <span className="ml-1 text-xl font-semibold text-gray-900">
+                          {candidate.copy}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-blue-500 h-2 rounded-full"
+                        style={{ width: `${candidate.copy}%` }}
+                      ></div>
+                    </div>
+                  </div>
+
+                  <div className="mt-5">
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm font-medium text-gray-500">
+                        Paste Events
+                      </div>
+                      <div className="flex items-center">
+                        <Star className="h-5 w-5 text-yellow-400" />
+                        <span className="ml-1 text-xl font-semibold text-gray-900">
+                          {candidate.paste}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-blue-500 h-2 rounded-full"
+                        style={{ width: `${candidate.paste}%` }}
+                      ></div>
+                    </div>
+                  </div>
+
+                  <div className="mt-5">
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm font-medium text-gray-500">
+                        Cut Events
+                      </div>
+                      <div className="flex items-center">
+                        <Star className="h-5 w-5 text-yellow-400" />
+                        <span className="ml-1 text-xl font-semibold text-gray-900">
+                          {candidate.cut}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-blue-500 h-2 rounded-full"
+                        style={{ width: `${candidate.cut}%` }}
+                      ></div>
+                    </div>
+                  </div>
+
+                  <div className="mt-5">
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm font-medium text-gray-500">
+                        Full Screen Exits
+                      </div>
+                      <div className="flex items-center">
+                        <Star className="h-5 w-5 text-yellow-400" />
+                        <span className="ml-1 text-xl font-semibold text-gray-900">
+                          {candidate.fullScreen}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-blue-500 h-2 rounded-full"
+                        style={{ width: `${candidate.fullScreen}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         </div>
       </main>
     </div>
-  )
+  );
 }
-

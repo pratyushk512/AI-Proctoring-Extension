@@ -2,7 +2,12 @@ import { User, Star } from 'lucide-react'
 
 
 export default function CandidateCard({ candidate }) {
+  if(candidate.socketId===undefined){
+    return null
+  }
+
   return (
+    
     <div className="bg-white overflow-hidden shadow rounded-lg">
       <div className="px-4 py-5 sm:p-6">
         <div className="flex items-center">
@@ -118,6 +123,7 @@ export default function CandidateCard({ candidate }) {
         </div>
       </div>
     </div>
+    
   )
 }
 
