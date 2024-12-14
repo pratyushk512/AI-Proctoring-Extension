@@ -38,8 +38,8 @@ def save_dataset_to_csv(data, labels, filename="typing_data_high_variance.csv"):
     df.to_csv(filename, index=False)
     print(f"Dataset saved to {filename}")
 
-num_human_samples = 500
-num_bot_samples = 500
+num_human_samples = 5000
+num_bot_samples = 5000
 data, labels = generate_dataset(num_human_samples, num_bot_samples)
 
 save_dataset_to_csv(data, labels)

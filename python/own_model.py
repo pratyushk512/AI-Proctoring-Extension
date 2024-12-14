@@ -30,8 +30,8 @@ class PrintPredictionsCallback(tf.keras.callbacks.Callback):
         print("Predictions:", np.round(predictions[:5].flatten(), 2))
 
 model = tf.keras.Sequential([
-    tf.keras.layers.Dense(64, activation='relu', input_shape=(X_train_scaled.shape[1],)),
-    tf.keras.layers.Dense(32, activation='relu'),
+    tf.keras.layers.Dense(16, activation='relu', input_shape=(X_train_scaled.shape[1],)),
+    tf.keras.layers.Dense(8, activation='relu'),
     tf.keras.layers.Dense(1)
 ])
 
@@ -40,7 +40,7 @@ model.compile(optimizer='adam', loss='mean_squared_error', metrics=['mean_absolu
 history = model.fit(
     X_train_scaled, y_train,
     validation_data=(X_val_scaled, y_val),
-    epochs=400, batch_size=32, verbose=1,
+    epochs=400, batch_size=8, verbose=1,
     callbacks=[PrintPredictionsCallback((X_val_scaled, y_val))]
 )
 
